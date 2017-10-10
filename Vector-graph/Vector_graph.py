@@ -159,19 +159,19 @@ print(sheet_ranges)
 plt.figure('Vectores '+estacion,figsize=(30, 8), dpi=80)                                                                       #Configura el tamaño y la resolucion de la ventana del grafico
 
 #Creacion de subgrafico en una figura y configuracion de sus ejes
-ejes_conf(1, "Modelos Geodesicos")           
+ejes_conf(1, ("Modelos Geodesicos - Vectice: " + estacion))           
 PPP_Vector(Velocidad_E,velocidad_N)                     
 Vmodel_graph(MotionModel_Geodesic)
 
 #plt.set_title("Vector de velocidad Estacion " + estacion, va='bottom',family='serif', style='italic', size=18)         # Titulo del grafico
 
 #Creacion de subgrafico en una figura y configuracion de sus ejes
-ejes_conf(2, "Modelos Geofisicos")
+ejes_conf(2, ("Modelos Geofisicos - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
 Vmodel_graph(MotionModel_Geodephysic)
 
 #Creacion de subgrafico en una figura y configuracion de sus ejes
-ejes_conf(3, "Modelos Combinados")
+ejes_conf(3, ("Modelos Combinados - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
 Vmodel_graph(MotionModel_Combinated)
 
