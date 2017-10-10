@@ -3,27 +3,30 @@
 
 import os                                                                                                               ## Importar modulo de comandos del sistema windows CMD
 import math                                                                                                             ## Importar modulo matematico de python
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np                                                                                                      ## Libreria con modulos matematicos avanzados
+import matplotlib.pyplot as plt                                                                                         ## Libreria para graficacion de datos 
 from openpyxl import load_workbook                                                                                      ##  Importa modulo de lectura de archivos (load_workbook ) -->>
                                                                                                                         ##  -->>de la libreria openpyxl
 
+
 ###VARIABLES DE INDENTIFICACION###
-estacion = "ABCC"
-velocidad_N = 16.9
-Velocidad_E = -1.07
+estacion = "RUBI"
+velocidad_N = 10.8
+Velocidad_E = -3.89
+path = "D:\GNSS Project Files\MODEL MOTION PLATE EXCEL\ESTACIONES SA(NNR)\MAGNAECO"
+Relacion_placa = "SA_(NNR)"
  
 #Funciones Matematicas#
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 def magnitude(x1,y1,x2,y2):                                                                                             # X = Coordebadas de longitud Y = Coordenadas de latitud 
-    raiz = round(math.sqrt((x2-x1)**2+(y2-y1)**2),2)                                                                  #calcula la magnitud de un vector y luego la redondea a dos decimales
+    raiz = math.sqrt((x2-x1)**2+(y2-y1)**2)                                                                  #calcula la magnitud de un vector y luego la redondea a dos decimales
     print ("Magnitud: ", str(raiz))    
     return raiz                                                                                                       ##devuelve el valor resultante de la operancion
    
 def azimuth(y, x):
 
     rads = math.atan2(x, y)                                                                                             #Calcula la magnitud de un vector, se invierten xy, ya que los angulos->       
-    angulo = round(math.degrees(rads),2)                                                                                #-> Se grafican en la cartografia, se indican en el sentido horario 
+    angulo = math.degrees(rads)                                                                               #-> Se grafican en la cartografia, se indican en el sentido horario 
     if angulo < 0:
         angulo = angulo + 360
         print("Azimuth: " + str(angulo))       
@@ -69,21 +72,28 @@ def ejes_conf(N_grafico,title):
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 def Vmodel_graph(MotionModel):
     counter = 0
+    global azimuths_global                                                                                                 #lista de tipo global para ser instanciada fuera de la funcion
+    azimuths_global = []                                                                                                   #Asignacion de valores  de azimuth a la variable global
+    global magnt_global                                                                                                    #lista de tipo global para ser instanciada fuera de la funcion
+    magnt_global = []                                                                                                      #Asignacion de valores  de magnitud a la variable global    
     for model in MotionModel:
         print(model[4])
         Evel = sheet_ranges[model[2]].value                                                                                # Obtencion de los datos  de Evel de las celdas dentro de excel
         Nvel = sheet_ranges[model[3]].value                                                                                # Obtencion de los datos  de Nvel de las celdas dentro de excel
     
         #Calculo de magnitud y azimuth 
-        print(Evel, Nvel)
+        print("Evel: " + str(Evel) + " " + "Nvel: " + str(Nvel))
         magnitud = magnitude(0, 0, Evel, Nvel)
         grados = azimuth(Nvel, Evel)
+
+        azimuths_global.append(round(grados,2))
+        magnt_global.append(round(magnitud,2))
 
         #Graficacion del vector 
         plt.arrow(0, 0, Evel, Nvel, head_width=0.40, head_length=0.80, width = 0.15,  fc=model[5], ec='#000000')    
 
         #Graficacion de la leyenda del vector
-        plt.arrow(-19.2, 20.25-counter, 1, 0, head_width=0.30, head_length=0.60, width = 0.10,  fc=model[5], ec='#000000')      #flecha de leyenda 
+        plt.arrow(-19.2, 20.25-counter, 1, 0, head_width=0.30, head_length=0.60, width = 0.10,  fc=model[5], ec='#000000')  #flecha de leyenda 
         plt.text(-24.5,20-counter, model[4], family='serif', style='italic', ha='center', wrap=True, size=10)               #Texto de leyenda
                                                                                        
         counter = counter + 1
@@ -143,40 +153,63 @@ MotionModel_Combinated =[GSMR2_1,GSMR1_2,MORVEL2010]
 
 ### UBUCACION DE DIRECTORIO DE TRABAJO DEL PROGRAMA
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
-os.chdir("D:\GNSS Project Files\MODEL MOTION PLATE EXCEL\ESTACIONES SA(NNR)\MAGNAECO")                                  ##Asignacion de la ruta donde se encuentran los archivos xlsx
-ruta = os.getcwd()                                                                                                      #Obtiene de ubicacion de ruta actual en el programa
-print ("DIRECCION: " + ruta)                                                                                            ##imprime la direccion actual del programa mediante el metodo getcwd()
+os.chdir(path)                             ##Asignacion de la ruta donde se encuentran los archivos xlsx
+ruta = os.getcwd()                                                                                                 #Obtiene de ubicacion de ruta actual en el programa
+print ("DIRECCION: " + ruta)                                                                                       ##imprime la direccion actual del programa mediante el metodo getcwd()
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-wb = load_workbook(estacion+'_SA(NNR).xlsx')                                                                          ##Comando para cargar  el archivo.xlsx
-sheetname = str(wb.get_sheet_names())                                                                                 ##Comando para obtener el nombre de las hojas de calculo del archivo y convertirlo en string
-sheetname = sheetname[2:-2]                                                                                           ##Se ajusta el nombre del sheetname ya que viene con estos caracteres de mas ['sheetname']
+wb = load_workbook(estacion+'_SA(NNR).xlsx')                                                                       ##Comando para cargar  el archivo.xlsx
+sheetname = str(wb.get_sheet_names())                                                                              ##Comando para obtener el nombre de las hojas de calculo del archivo y convertirlo en string
+sheetname = sheetname[2:-2]                                                                                        ##Se ajusta el nombre del sheetname ya que viene con estos caracteres de mas ['sheetname']
 print ('El archuvo ' + sheetname +'.xlsx ha sido abierto')  
-sheet_ranges = wb[sheetname]                                                                                          ##De esta forma se guarda la hoja de calculo como un objeto y sus celdas como atributos del objeto
+sheet_ranges = wb[sheetname]                                                                                       ##De esta forma se guarda la hoja de calculo como un objeto y sus celdas como atributos del objeto
 print(sheet_ranges)
 
 ##Configuracion de la ventana y tipo de grafico a usar
-plt.figure('Vectores '+estacion,figsize=(30, 8), dpi=80)                                                                       #Configura el tamaño y la resolucion de la ventana del grafico
+plt.figure('Vectores '+estacion,figsize=(30, 8), dpi=80)                                                           #Configura el tamaño y la resolucion de la ventana del grafico
+fichero = open("C:/Users/julia/Desktop/vectores/"+ estacion + ".txt", "w")                                         #se crea un archivo fichero .txt en la direccion indicada 
 
 #Creacion de subgrafico en una figura y configuracion de sus ejes
 ejes_conf(1, ("Modelos Geodesicos - Vectice: " + estacion))           
-PPP_Vector(Velocidad_E,velocidad_N)                     
-Vmodel_graph(MotionModel_Geodesic)
-
-#plt.set_title("Vector de velocidad Estacion " + estacion, va='bottom',family='serif', style='italic', size=18)         # Titulo del grafico
+PPP_Vector(Velocidad_E,velocidad_N)                                                                                #Funcion de graficacion y calculo del vector PPP            
+Vmodel_graph(MotionModel_Geodesic)                                                                                 #Funcion de graficacion y calculo de los vectores de los modelos de movimiento
+fichero.write("MODELOS GEODESICOS - VERTICE: " + estacion + "\n")
+fichero.write("AZM      " + "MAGNTD   " + "Modelo" + "\n")
+counterlist = 0
+for listModel in MotionModel_Geodesic:
+    fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
+    counterlist = counterlist+1
+fichero.write("\n")
 
 #Creacion de subgrafico en una figura y configuracion de sus ejes
 ejes_conf(2, ("Modelos Geofisicos - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
 Vmodel_graph(MotionModel_Geodephysic)
+fichero.write("MODELOS GEOFISICOS VERTICE: " + estacion + "\n")
+fichero.write("AZM     " + "MAGNTD     " + "Modelo" + "\n")
+counterlist = 0
+for listModel in MotionModel_Geodephysic:
+    fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
+    counterlist = counterlist+1
+
+fichero.write("\n")
+
 
 #Creacion de subgrafico en una figura y configuracion de sus ejes
 ejes_conf(3, ("Modelos Combinados - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
 Vmodel_graph(MotionModel_Combinated)
+fichero.write("MODELOS COMBINADOS VERTICE: " + estacion + "\n")
+fichero.write("AZM     " + "MAGNTD     " + "Modelo" + "\n")
+counterlist = 0
+for listModel in MotionModel_Combinated:
+    fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
+    counterlist = counterlist+1
+fichero.write("\n")
 
-plt.grid(False)                                                                                                         #Se omite la graficacion de la grilla
-plt.show()                                                                                                              #Se crea muestra el grafico
+fichero.close() 
+plt.grid(False)                                                                                                       #Se omite la graficacion de la grilla
+plt.show()                                                                                                            #Se crea muestra el grafico
 
 
-#savefig("Vectores_Estacion:" + estacion + ".png", dpi=80)                                                              # Guardar la figura usando 72 puntos por pulgada
+#savefig("Vectores_Estacion:" + estacion + ".png", dpi=80)                                                            # Guardar la figura usando 72 puntos por pulgada
