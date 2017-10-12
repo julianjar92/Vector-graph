@@ -16,6 +16,11 @@ Velocidad_E = -3.89
 path = "D:\GNSS Project Files\MODEL MOTION PLATE EXCEL\ESTACIONES SA(NNR)\MAGNAECO"
 Relacion = "SA_(NNR)"
 path_OUT = "C:/Users/julia/Desktop/vectores/"
+
+residual_Evel = []
+residual_Nvel = []
+residual_magntd = []
+residual_AZM = []
  
 #Funciones Matematicas#
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -68,17 +73,18 @@ def ejes_conf(N_grafico,title):
     
 ### Funcion para graficacion de vetores de los modelos de movmiento ### Solo se puede usar despues de cargar los archivos .xlsx 
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
-def Vmodel_graph(MotionModel):
+def Vmodel_graph(MotionModel,PPP_E, PPP_N):
     counter = 0
     global azimuths_global                                                                                                 #lista de tipo global para ser instanciada fuera de la funcion
     azimuths_global = []                                                                                                   #Asignacion de valores  de azimuth a la variable global
     global magnt_global                                                                                                    #lista de tipo global para ser instanciada fuera de la funcion
-    magnt_global = []                                                                                                      #Asignacion de valores  de magnitud a la variable global    
+    magnt_global = []
+
     for model in MotionModel:
         print(model[4])
         Evel = sheet_ranges[model[2]].value                                                                                # Obtencion de los datos  de Evel de las celdas dentro de excel
         Nvel = sheet_ranges[model[3]].value                                                                                # Obtencion de los datos  de Nvel de las celdas dentro de excel
-    
+        
         #Calculo de magnitud y azimuth 
         print("Evel: " + str(Evel) + " " + "Nvel: " + str(Nvel))
         magnitud = magnitude(0, 0, Evel, Nvel)
@@ -181,7 +187,7 @@ Vector_sheet.title = estacion                                                   
 #Creacion de subgrafico en una figura y configuracion de sus ejes
 ejes_conf(1, ("Modelos Geodesicos - Vectice: " + estacion))           
 PPP_Vector(Velocidad_E,velocidad_N)                                                                                #Funcion de graficacion y calculo del vector PPP            
-Vmodel_graph(MotionModel_Geodesic)                                                                                 #Funcion de graficacion y calculo de los vectores de los modelos de movimiento
+Vmodel_graph(MotionModel_Geodesic, Velocidad_E,velocidad_N)                                                                                 #Funcion de graficacion y calculo de los vectores de los modelos de movimiento
 fichero.write("DATOS PROCESADOS PPP \n")
 fichero.write("AZM      " + "MAGTD   " + "\n")
 fichero.write(str(round(azimuth(velocidad_N, Velocidad_E),2)) + "   " + str(round(magnitude(0, 0, Velocidad_E, velocidad_N),2)) + "\n")
@@ -195,16 +201,28 @@ Vector_sheet["A2"] = "AZM";  Vector_sheet["B2"] = "MAGNTD"
 Vector_sheet["A3"] = round(azimuth(velocidad_N, Velocidad_E),2); Vector_sheet["B3"] = round(magnitude(0, 0, Velocidad_E, velocidad_N),2) ##Inserta los valores del vector PPP en las celdas del archivo xlsx
 
 Vector_sheet["A5"] = "MODELOS"; Vector_sheet["B5"] = "GEODESICOS"
-Vector_sheet["A6"] = "AZIMUTH";  Vector_sheet["B6"] = "MAGNITUD" ;  Vector_sheet["C6"] = "Vec. Rsd"; Vector_sheet["D6"] = "MODELO"  
+Vector_sheet["A6"] = "AZIMUTH";  Vector_sheet["B6"] = "MANGTD" ;  
+Vector_sheet["C6"] = "R-Evel"; Vector_sheet["D6"] = "R-Nvel" ; 
+Vector_sheet["E6"] = "R-AZM" ; Vector_sheet["F6"] = "R-MANGTD";
+Vector_sheet["G6"] = "MODELO"
 
 counterlist = 0
 for listModel in MotionModel_Geodesic:
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
+    ##Calculo de vector residual
+    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                        # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
+    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                        # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
+    residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))
+    residual_AZM.append(round(azimuth(residual_Nvel[counterlist], residual_Evel[counterlist]),2))
+    
     #Escritura DE DATOS en excel
     Vector_sheet.cell(row = counterlist+7, column = 1).value = azimuths_global[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=2).value = magnt_global[counterlist]
-
-    Vector_sheet.cell(row=counterlist+7, column=4).value = listModel[4]
+    Vector_sheet.cell(row=counterlist+7, column=3).value = residual_Evel[counterlist]
+    Vector_sheet.cell(row=counterlist+7, column=4).value = residual_Nvel[counterlist] 
+    Vector_sheet.cell(row=counterlist+7, column=5).value = residual_AZM[counterlist]
+    Vector_sheet.cell(row=counterlist+7, column=6).value = residual_magntd[counterlist]
+    Vector_sheet.cell(row=counterlist+7, column=7).value = listModel[4]
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -214,21 +232,35 @@ fichero.write("\n")
 #Creacion de subgrafico en una figura y configuracion de sus ejes
 ejes_conf(2, ("Modelos Geofisicos - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
-Vmodel_graph(MotionModel_Geodephysic)
+Vmodel_graph(MotionModel_Geodephysic, Velocidad_E,velocidad_N)
 fichero.write("MODELOS GEOFISICOS VERTICE: " + estacion + "\n")
 fichero.write("AZM     " + "MAGNTD     " + "Modelo" + "\n")
 ###Marcadores de columnas archivo excel
 Vector_sheet["A17"] = "MODELOS"; Vector_sheet["B17"] = "GEOFISICOS"
-Vector_sheet["A18"] = "AZIMUTH";  Vector_sheet["B18"] = "MAGNITUD" ;  Vector_sheet["C18"] = "Vec. Rsd"; Vector_sheet["D18"] = "MODELO"  
+Vector_sheet["A18"] = "AZIMUTH";  Vector_sheet["B18"] = "MANGTD" ;  
+Vector_sheet["C18"] = "R-Evel"; Vector_sheet["D18"] = "R-Nvel" ; 
+Vector_sheet["E18"] = "R-AZM" ; Vector_sheet["F18"] = "R-MANGTD";
+Vector_sheet["G18"] = "MODELO"
 
 counterlist = 0
+residual_Evel = []
+residual_Nvel = []
 for listModel in MotionModel_Geodephysic:
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")                                         #Escritura en .txt
-    #Escritura DE DATOS en excel
-    Vector_sheet.cell(row = counterlist+18, column = 1).value = azimuths_global[counterlist]
-    Vector_sheet.cell(row=counterlist+18, column=2).value = magnt_global[counterlist]
+    ##Calculo de vector residual
+    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                        # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
+    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                        # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
+    residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))
+    residual_AZM.append(round(azimuth(residual_Nvel[counterlist], residual_Evel[counterlist]),2))
 
-    Vector_sheet.cell(row=counterlist+18, column=4).value = listModel[4]
+    #Escritura DE DATOS en excel
+    Vector_sheet.cell(row = counterlist+19, column = 1).value = azimuths_global[counterlist]
+    Vector_sheet.cell(row=counterlist+19, column=2).value = magnt_global[counterlist]
+    Vector_sheet.cell(row=counterlist+19, column=3).value = residual_Evel[counterlist]
+    Vector_sheet.cell(row=counterlist+19, column=4).value = residual_Nvel[counterlist] 
+    Vector_sheet.cell(row=counterlist+19, column=5).value = residual_AZM[counterlist]
+    Vector_sheet.cell(row=counterlist+19, column=6).value = residual_magntd[counterlist]
+    Vector_sheet.cell(row=counterlist+19, column=7).value = listModel[4]
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -238,21 +270,35 @@ fichero.write("\n")
 #Creacion de subgrafico en una figura y configuracion de sus ejes
 ejes_conf(3, ("Modelos Combinados - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
-Vmodel_graph(MotionModel_Combinated)
+Vmodel_graph(MotionModel_Combinated, Velocidad_E,velocidad_N)
 fichero.write("MODELOS COMBINADOS VERTICE: " + estacion + "\n")
 fichero.write("AZM     " + "MAGNTD     " + "Modelo" + "\n")
 ###Marcadores de columnas archivo excel
-Vector_sheet["A24"] = "MODELOS"; Vector_sheet["B24"] = "GEOFISICOS"
-Vector_sheet["A25"] = "AZIMUTH";  Vector_sheet["B25"] = "MAGNITUD" ;  Vector_sheet["C25"] = "Vec. Rsd"; Vector_sheet["D25"] = "MODELO" 
+Vector_sheet["A25"] = "MODELOS"; Vector_sheet["B25"] = "GEOFISICOS"
+Vector_sheet["A26"] = "AZIMUTH";  Vector_sheet["B26"] = "MANGTD" ;  
+Vector_sheet["C26"] = "R-Evel"; Vector_sheet["D26"] = "R-Nvel" ; 
+Vector_sheet["E26"] = "R-AZM" ; Vector_sheet["F26"] = "R-MANGTD";
+Vector_sheet["G26"] = "MODELO"
 
 counterlist = 0
+residual_Evel = []
+residual_Nvel = []
 for listModel in MotionModel_Combinated:
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
-    #Escritura DE DATOS en excel
-    Vector_sheet.cell(row = counterlist+26, column = 1).value = azimuths_global[counterlist]
-    Vector_sheet.cell(row=counterlist+26, column=2).value = magnt_global[counterlist]
+    ##Calculo de vector residual
+    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                        # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
+    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                        # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
+    residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))
+    residual_AZM.append(round(azimuth(residual_Nvel[counterlist], residual_Evel[counterlist]),2))
 
-    Vector_sheet.cell(row=counterlist+26, column=4).value = listModel[4]    
+    #Escritura DE DATOS en excel
+    Vector_sheet.cell(row=counterlist+27, column = 1).value = azimuths_global[counterlist]
+    Vector_sheet.cell(row=counterlist+27, column=2).value = magnt_global[counterlist]
+    Vector_sheet.cell(row=counterlist+27, column=3).value = residual_Evel[counterlist]
+    Vector_sheet.cell(row=counterlist+27, column=4).value = residual_Nvel[counterlist] 
+    Vector_sheet.cell(row=counterlist+27, column=5).value = residual_AZM[counterlist]
+    Vector_sheet.cell(row=counterlist+27, column=6).value = residual_magntd[counterlist]
+    Vector_sheet.cell(row=counterlist+27, column=7).value = listModel[4]  
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
