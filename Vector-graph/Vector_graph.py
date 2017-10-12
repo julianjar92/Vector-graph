@@ -14,14 +14,13 @@ estacion = "RUBI"
 velocidad_N = 10.8
 Velocidad_E = -3.89
 path = "D:\GNSS Project Files\MODEL MOTION PLATE EXCEL\ESTACIONES SA(NNR)\MAGNAECO"
-Relacion_placa = "SA_(NNR)"
+Relacion = "SA_(NNR)"
 path_OUT = "C:/Users/julia/Desktop/vectores/"
  
 #Funciones Matematicas#
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 def magnitude(x1,y1,x2,y2):                                                                                             # X = Coordebadas de longitud Y = Coordenadas de latitud 
-    raiz = math.sqrt((x2-x1)**2+(y2-y1)**2)                                                                  #calcula la magnitud de un vector y luego la redondea a dos decimales
-    print ("Magnitud: ", str(raiz))    
+    raiz = math.sqrt((x2-x1)**2+(y2-y1)**2)                                                                  #calcula la magnitud de un vector y luego la redondea a dos decimales  
     return raiz                                                                                                       ##devuelve el valor resultante de la operancion
    
 def azimuth(y, x):
@@ -29,11 +28,9 @@ def azimuth(y, x):
     rads = math.atan2(x, y)                                                                                             #Calcula la magnitud de un vector, se invierten xy, ya que los angulos->       
     angulo = math.degrees(rads)                                                                               #-> Se grafican en la cartografia, se indican en el sentido horario 
     if angulo < 0:
-        angulo = angulo + 360
-        print("Azimuth: " + str(angulo))       
+        angulo = angulo + 360 
         return angulo                         
-    else: 
-        print("Azimuth: " + str(angulo))       
+    else:     
         return angulo                                                                                                 ##devuelve el valor resultante de la operancion
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
@@ -121,27 +118,27 @@ def PPP_Vector(long, latd):
 #Modelos de tipo geodesico
                     #CELDAS DE LECTURA EXCEL UNAVCO                    #CELDAS DE ESCRITURA EXCEL PROCESADO
 ##LISTA           Long    Lat  Evel Nvel   Modelo de movimiento Color  AZM   MAGNITUD POSICION MODELO
-ITRF2008       = ['B12','C12','D11','E11',      "ITRF2008",  '#8F0724','A4','B4',     'C4'] #Modelo Geodesico       
-ITRF2000AS     = ['B24','C24','D23','E23',    "ITRF2000AS",  '#FF0000','A5','B5',     'C5'] #Modelo Geodesico
-ITRF2000DA     = ['B30','C30','D29','E29',    "ITRF2000DA",  '#FF8000','A6','B6',     'C6'] #Modelo Geodesico
-APKIM2005_DGFI = ['B14','C14','D13','E13',"APKIM2005_DGFI",  '#86D200','A7','B7',     'C7'] #Modelo Geodesico
-APKIM2005_IGN  = ['B16','C16','D15','E15', "APKIM2005_IGN",  '#29D200','A8','B8',     'C8'] #Modelo Geodesico
-APKIM2000      = ['B28','C28','D27','E27',     "APKIM2000",  '#008C2B','A9','B9',     'C9'] #Modelo Geodesico
-CGPS2004       = ['B20','C20','D19','E19',      "CGPS2004",  '#00FFD4','A10','B10',  'C10'] #Modelo Geodesico
-REVEL2000      = ['B22','C22','D21','E21',     "REVEL2000",  '#00A7E5','A11','B11',  'C11'] #Modelo Geodesico
-GEODVEL2010    = ['B8','C8','D7','E7',       "GEODVEL2010",  '#0061E5','A12','B12',  'C12'] #Modelo Geodesico
+ITRF2008       = ['B12','C12','D11','E11',      "ITRF2008",  '#8F0724'] #Modelo Geodesico       
+ITRF2000AS     = ['B24','C24','D23','E23',    "ITRF2000AS",  '#FF0000'] #Modelo Geodesico
+ITRF2000DA     = ['B30','C30','D29','E29',    "ITRF2000DA",  '#FF8000'] #Modelo Geodesico
+APKIM2005_DGFI = ['B14','C14','D13','E13',"APKIM2005_DGFI",  '#86D200'] #Modelo Geodesico
+APKIM2005_IGN  = ['B16','C16','D15','E15', "APKIM2005_IGN",  '#29D200'] #Modelo Geodesico
+APKIM2000      = ['B28','C28','D27','E27',     "APKIM2000",  '#008C2B'] #Modelo Geodesico
+CGPS2004       = ['B20','C20','D19','E19',      "CGPS2004",  '#00FFD4'] #Modelo Geodesico
+REVEL2000      = ['B22','C22','D21','E21',     "REVEL2000",  '#00A7E5'] #Modelo Geodesico
+GEODVEL2010    = ['B8','C8','D7','E7',       "GEODVEL2010",  '#0061E5'] #Modelo Geodesico
 
 #Modelo Matricial para seleccion de modelo de movmiento de placa  y seleccion de sus celdas correspodientes en excel
-MotionModel_Geodesic = [ITRF2008,ITRF2008,ITRF2000AS,ITRF2000DA,APKIM2005_DGFI,APKIM2005_IGN,APKIM2000,CGPS2004,REVEL2000,GEODVEL2010]
+MotionModel_Geodesic = [ITRF2008,ITRF2000AS,ITRF2000DA,APKIM2005_DGFI,APKIM2005_IGN,APKIM2000,CGPS2004,REVEL2000,GEODVEL2010]
 
 #Modelos de tipo Geofisico
                     #CELDAS DE LECTURA EXCEL UNAVCO                    #CELDAS DE ESCRITURA EXCEL PROCESADO
 ##LISTA           Long  Lat  Evel Nvel  Modelo de movimiento Color  AZM   MAGNITUD POSICION MODELO
-NNR_MORVEL     = ['B6','C6','D5','E5',        "NNR_MORVEL",   "#1AD3C2",'A16','B16',     'C16'] #Modelo Geofisico
-HS3_NUVEL1A    = ['B26','C26','D25','E25',   "HS3_NUVEL1A",   "#40008D",'A17','B17',     'C17'] #Modelo Geofisico
-HS2_NUVEL1A    = ['B32','C32','D31','E31',   "HS2_NUVEL1A",   "#20008D",'A18','B18',     'C18'] #Modelo Geofisico
-NUVEL1A        = ['B34','C34','D33','E33',       "NUVEL1A",   "#C50C66",'A19','B19',     'C19'] #Modelo Geofisico
-NUVEL1         = ['B36','C36','D35','E35',        "NUVEL1",   "#FC1EFF",'A20','B20',     'C20'] #Modelo Geofisico
+NNR_MORVEL     = ['B6','C6','D5','E5',        "NNR_MORVEL",   "#1AD3C2"] #Modelo Geofisico
+HS3_NUVEL1A    = ['B26','C26','D25','E25',   "HS3_NUVEL1A",   "#40008D"] #Modelo Geofisico
+HS2_NUVEL1A    = ['B32','C32','D31','E31',   "HS2_NUVEL1A",   "#20008D"] #Modelo Geofisico
+NUVEL1A        = ['B34','C34','D33','E33',       "NUVEL1A",   "#C50C66"] #Modelo Geofisico
+NUVEL1         = ['B36','C36','D35','E35',        "NUVEL1",   "#FC1EFF"] #Modelo Geofisico
 
 #Modelo Matricial para seleccion de modelo de movmiento de placa  y seleccion de sus celdas correspodientes en excel
 MotionModel_Geodephysic = [NNR_MORVEL,HS3_NUVEL1A,HS2_NUVEL1A, NUVEL1A, NUVEL1]
@@ -149,9 +146,9 @@ MotionModel_Geodephysic = [NNR_MORVEL,HS3_NUVEL1A,HS2_NUVEL1A, NUVEL1A, NUVEL1]
 #Modelos de movimiento de tipo combinado
                     #CELDAS DE LECTURA EXCEL UNAVCO                    #CELDAS DE ESCRITURA EXCEL PROCESADO
 ##LISTA            Long  Lat Evel Nvel  Modelo de movimiento Color  AZM   MAGNITUD POSICION MODELO
-GSMR2_1        = ['B4','C4','D3','E3',           "GSMR2_1", "#565656",'A24','B24',     'C24'] #Modelo Combinado
-GSMR1_2        = ['B18','C18','D17','E17',       "GSMR1_2", "#999999",'A25','B25',     'C25'] #Modelo Combinado
-MORVEL2010     = ['B10','C10','D9','E9',      "MORVEL2010", "#7EBBA0",'A26','B26',     'C26'] #Modelo Combinado
+GSMR2_1        = ['B4','C4','D3','E3',           "GSMR2_1", "#565656"] #Modelo Combinado
+GSMR1_2        = ['B18','C18','D17','E17',       "GSMR1_2", "#999999"] #Modelo Combinado
+MORVEL2010     = ['B10','C10','D9','E9',      "MORVEL2010", "#7EBBA0"] #Modelo Combinado
 
 #Modelo Matricial para seleccion de modelo de movmiento de placa  y seleccion de sus celdas correspodientes en excel
 MotionModel_Combinated =[GSMR2_1,GSMR1_2,MORVEL2010]
@@ -171,18 +168,13 @@ sheet_ranges = wb[sheetname]                                                    
 print(sheet_ranges)
 
 ##Configuracion de la ventana y tipo de grafico a usar
-plt.figure('Vectores '+estacion,figsize=(30, 8), dpi=80)                                                           #Configura el tamaño y la resolucion de la ventana del grafico
+plt.figure('VECTORES_'+estacion + "_" +Relacion,figsize=(30, 8), dpi=80)                                                           #Configura el tamaño y la resolucion de la ventana del grafico
 ###Creacion de fichero que contendra los datos resultantes al procesamiento
-fichero = open(path_OUT + estacion + ".txt", "w")                                         #se crea un archivo fichero .txt en la direccion indicada 
+fichero = open(path_OUT + "VECTORES_" + estacion + "_" +  Relacion + ".txt", "w")                                         #se crea un archivo fichero .txt en la direccion indicada 
 
 vector_book = Workbook()                                                                                           # Crea el objeto libro de la clase workbook de openpyxl
 Vector_sheet = vector_book.create_sheet("Mysheet", 0)                                                              # crea el objeto hoja de la clase hoja 
 Vector_sheet.title = estacion                                                                                      # Asigna un string al atributo titulo del objeto hoja
-
-Vector_sheet["A1"] = "MODELOS"; Vector_sheet["B1"] = "GEODESICOS"
-Vector_sheet["A2"] = "AZIMUTH";  Vector_sheet["B2"] = "MAGNITUD" ;  Vector_sheet["C2"] = "MODELO"  
-Vector_sheet["A3"] = round(azimuth(velocidad_N, Velocidad_E),2); Vector_sheet["B3"] = round(magnitude(0, 0, Velocidad_E, velocidad_N),2) ##Inserta los valores del vector PPP en las celdas del archivo xlsx
-Vector_sheet["C3"] = "PPP"
 
 ###Sub grafico 1
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -190,14 +182,29 @@ Vector_sheet["C3"] = "PPP"
 ejes_conf(1, ("Modelos Geodesicos - Vectice: " + estacion))           
 PPP_Vector(Velocidad_E,velocidad_N)                                                                                #Funcion de graficacion y calculo del vector PPP            
 Vmodel_graph(MotionModel_Geodesic)                                                                                 #Funcion de graficacion y calculo de los vectores de los modelos de movimiento
-###Marcadores de columnas archivo excel
+fichero.write("DATOS PROCESADOS PPP \n")
+fichero.write("AZM      " + "MAGTD   " + "\n")
+fichero.write(str(round(azimuth(velocidad_N, Velocidad_E),2)) + "   " + str(round(magnitude(0, 0, Velocidad_E, velocidad_N),2)) + "\n")
+fichero.write("\n")
+
 fichero.write("MODELOS GEODESICOS - VERTICE: " + estacion + "\n")
 fichero.write("AZM      " + "MAGNTD   " + "Modelo" + "\n")
+###Marcadores de columnas archivo excel
+Vector_sheet["A1"] = "DATOS";  Vector_sheet["B1"] = "PPP" 
+Vector_sheet["A2"] = "AZM";  Vector_sheet["B2"] = "MAGNTD" 
+Vector_sheet["A3"] = round(azimuth(velocidad_N, Velocidad_E),2); Vector_sheet["B3"] = round(magnitude(0, 0, Velocidad_E, velocidad_N),2) ##Inserta los valores del vector PPP en las celdas del archivo xlsx
+
+Vector_sheet["A5"] = "MODELOS"; Vector_sheet["B5"] = "GEODESICOS"
+Vector_sheet["A6"] = "AZIMUTH";  Vector_sheet["B6"] = "MAGNITUD" ;  Vector_sheet["C6"] = "Vec. Rsd"; Vector_sheet["D6"] = "MODELO"  
 
 counterlist = 0
 for listModel in MotionModel_Geodesic:
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
-    Vector_sheet[listModel[6]] = azimuths_global[counterlist]; Vector_sheet[listModel[7]] = magnt_global[counterlist]; Vector_sheet[listModel[8]] = listModel[4] 
+    #Escritura DE DATOS en excel
+    Vector_sheet.cell(row = counterlist+7, column = 1).value = azimuths_global[counterlist]
+    Vector_sheet.cell(row=counterlist+7, column=2).value = magnt_global[counterlist]
+
+    Vector_sheet.cell(row=counterlist+7, column=4).value = listModel[4]
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -211,13 +218,17 @@ Vmodel_graph(MotionModel_Geodephysic)
 fichero.write("MODELOS GEOFISICOS VERTICE: " + estacion + "\n")
 fichero.write("AZM     " + "MAGNTD     " + "Modelo" + "\n")
 ###Marcadores de columnas archivo excel
-Vector_sheet["A14"] = "MODELOS"; Vector_sheet["B14"] = "GEOFISICOS"
-Vector_sheet["A15"] = "AZIMUTH";  Vector_sheet["B15"] = "MAGNITUD" ;  Vector_sheet["C15"] = "MODELO"  
+Vector_sheet["A17"] = "MODELOS"; Vector_sheet["B17"] = "GEOFISICOS"
+Vector_sheet["A18"] = "AZIMUTH";  Vector_sheet["B18"] = "MAGNITUD" ;  Vector_sheet["C18"] = "Vec. Rsd"; Vector_sheet["D18"] = "MODELO"  
 
 counterlist = 0
 for listModel in MotionModel_Geodephysic:
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")                                         #Escritura en .txt
-    Vector_sheet[listModel[6]] = azimuths_global[counterlist]; Vector_sheet[listModel[7]] = magnt_global[counterlist]; Vector_sheet[listModel[8]] = listModel[4]    #Escritura en excel
+    #Escritura DE DATOS en excel
+    Vector_sheet.cell(row = counterlist+18, column = 1).value = azimuths_global[counterlist]
+    Vector_sheet.cell(row=counterlist+18, column=2).value = magnt_global[counterlist]
+
+    Vector_sheet.cell(row=counterlist+18, column=4).value = listModel[4]
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -231,18 +242,22 @@ Vmodel_graph(MotionModel_Combinated)
 fichero.write("MODELOS COMBINADOS VERTICE: " + estacion + "\n")
 fichero.write("AZM     " + "MAGNTD     " + "Modelo" + "\n")
 ###Marcadores de columnas archivo excel
-Vector_sheet["A22"] = "MODELOS"; Vector_sheet["B22"] = "GEOFISICOS"
-Vector_sheet["A23"] = "AZIMUTH";  Vector_sheet["B23"] = "MAGNITUD" ;  Vector_sheet["C23"] = "MODELO" 
+Vector_sheet["A24"] = "MODELOS"; Vector_sheet["B24"] = "GEOFISICOS"
+Vector_sheet["A25"] = "AZIMUTH";  Vector_sheet["B25"] = "MAGNITUD" ;  Vector_sheet["C25"] = "Vec. Rsd"; Vector_sheet["D25"] = "MODELO" 
 
 counterlist = 0
 for listModel in MotionModel_Combinated:
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   " + listModel[4] + "\n")
-    Vector_sheet[listModel[6]] = azimuths_global[counterlist]; Vector_sheet[listModel[7]] = magnt_global[counterlist]; Vector_sheet[listModel[8]] = listModel[4]    #Escritura en excel
+    #Escritura DE DATOS en excel
+    Vector_sheet.cell(row = counterlist+26, column = 1).value = azimuths_global[counterlist]
+    Vector_sheet.cell(row=counterlist+26, column=2).value = magnt_global[counterlist]
+
+    Vector_sheet.cell(row=counterlist+26, column=4).value = listModel[4]    
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-vector_book.save(path_OUT + "Vectores" + estacion + ".xlsx")                                                          # Guarda el archivo xlsx en una direccion especifica
+vector_book.save(path_OUT + "VECTORES_" + estacion + "_" + Relacion + ".xlsx")                                                          # Guarda el archivo xlsx en una direccion especifica
 vector_book.close()
 fichero.close() 
 plt.grid(False)                                                                                                       #Se omite la graficacion de la grilla
