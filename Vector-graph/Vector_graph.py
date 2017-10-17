@@ -1,21 +1,33 @@
-##HACER QUE EL PROGRAMA IMPROMA LOS GRAFICOS PARA CADA TIPO DE MODELO, Y GENERAR TABLAS CON SUS VALORES DE AZIMUTH Y MAGNITUD
-##Calcular el vector residual y montar en la tabla de graficos pendiente
+###Los graficos del script son calculados y graficados en el sentido horario de las manecillas del reloj, ademas de esto se toma la direccion geografica norte
+### como punto de inicio de 0 grados, todo esto se realiza de modo que la orientacion de los graficos sea la misma a la orientacion que se usa en la cartografia
+
+#                     N 0°
+#                      ^
+#                      |
+#                      |
+#       O 270° <------ + ------>  E 90°
+#                      |
+#                      | 
+#                      v            
+#                     S 180°
+
 
 import os                                                                                                               ## Importar modulo de comandos del sistema windows CMD
 import math                                                                                                             ## Importar modulo matematico de python
 import numpy as np                                                                                                      ## Libreria con modulos matematicos avanzados
 import matplotlib.pyplot as plt                                                                                         ## Libreria para graficacion de datos 
 from openpyxl import load_workbook                                                                                      ##  Importa modulo de lectura de archivos (load_workbook ) -->>
-from openpyxl import Workbook                                                                                      ##  Importa modulo de lectura de archivos (load_workbook ) -->>                                                                                                                        ##  -->>de la libreria openpyxl
+from openpyxl import Workbook                                                                                           ##  Importa modulo de lectura de archivos (load_workbook ) -->>                                                                                                                        ##  -->>de la libreria openpyxl
 
 
 ###VARIABLES DE INDENTIFICACION###
 estacion = "ABCC"
-velocidad_N = 16.9
+##PPP
 Velocidad_E = -1.07
-path = "D:/GNSS Project Files/MODEL MOTION PLATE EXCEL/ESTACIONES SA(NNR)/MAGNAECO"
-Relacion = "SA_(NNR)"
-path_OUT = "C:/Users/julia/Desktop/vectores/SA(NNR)/"
+velocidad_N = 16.9
+path = "D:/MODEL MOTION EXCEL/ESTACIONES CA(NNR)/MAGNAECO"
+Relacion = "CA(NNR)"
+path_OUT = "F:/Archivos y datos GNSS/VECTORES/CA(NNR)/"
 
 residual_Evel = []
 residual_Nvel = []
@@ -97,8 +109,8 @@ def Vmodel_graph(MotionModel,PPP_E, PPP_N):
         plt.arrow(0, 0, Evel, Nvel, head_width=0.40, head_length=0.80, width = 0.15,  fc=model[5], ec='#000000')    
 
         #Graficacion de la leyenda del vector
-        plt.arrow(-19.2, 20.25-counter, 1, 0, head_width=0.30, head_length=0.60, width = 0.10,  fc=model[5], ec='#000000')  #flecha de leyenda 
-        plt.text(-24.5,20-counter, model[4], family='serif', style='italic', ha='center', wrap=True, size=10)               #Texto de leyenda
+        plt.arrow(16.2, 20.25-counter, 1, 0, head_width=0.30, head_length=0.60, width = 0.10,  fc=model[5], ec='#000000')  #flecha de leyenda 
+        plt.text(22.5,20-counter, model[4], family='serif', style='italic', ha='center', wrap=True, size=10)               #Texto de leyenda
                                                                                        
         counter = counter + 1
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -115,8 +127,8 @@ def PPP_Vector(long, latd):
     plt.arrow(0, 0, long, latd, head_width=0.4, head_length=0.8, width = 0.15,  fc='#000000', ec='#000000')                   #(X, ,Y, unidades a recorrer en x,unidades a recorrer en Y)  
                                                                                                                           #fc = color relleno de la flecha ec = color del borde de la flecha.   
     #LEYENDA PPP
-    plt.arrow(-19.2, 21.1, 1, 0, head_width=0.30, head_length=0.60, width = 0.10,  fc='#000000', ec='#000000')                    #flecha de leyenda 
-    plt.text(-24.5, 21, "PPP", family='serif', style='italic', ha='center', wrap=True, size=10)                              #Texto de leyenda
+    plt.arrow(16.2, 21.1, 1, 0, head_width=0.30, head_length=0.60, width = 0.10,  fc='#000000', ec='#000000')                    #flecha de leyenda 
+    plt.text(22.5, 21, "PPP", family='serif', style='italic', ha='center', wrap=True, size=10)                              #Texto de leyenda
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
                               
 ##Valores indicativos de las celdas de los modelos de movmiento de placas tectonicas
@@ -166,7 +178,7 @@ ruta = os.getcwd()                                                              
 print ("DIRECCION: " + ruta)                                                                                       ##imprime la direccion actual del programa mediante el metodo getcwd()
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-wb = load_workbook(estacion+'_SA(NNR).xlsx')                                                                       ##Comando para cargar  el archivo.xlsx
+wb = load_workbook(estacion+'_' + Relacion + '.xlsx')                                                                       ##Comando para cargar  el archivo.xlsx
 sheetname = str(wb.get_sheet_names())                                                                              ##Comando para obtener el nombre de las hojas de calculo del archivo y convertirlo en string
 sheetname = sheetname[2:-2]                                                                                        ##Se ajusta el nombre del sheetname ya que viene con estos caracteres de mas ['sheetname']
 print ('El archuvo ' + sheetname +'.xlsx ha sido abierto')  
@@ -195,7 +207,7 @@ fichero.write(str(round(azimuth(velocidad_N, Velocidad_E),2)) + "   " + str(roun
 fichero.write("\n")
 ###Marcadores de columnas archivo txt
 fichero.write("MODELOS GEODESICOS - VERTICE: " + estacion + "\n")
-fichero.write("AZM     " + "MAGNTD " + "R-Evel " +	"R-Nvel " + "R-AZM " + "R-MANGTD  " + "MODELO" + "\n")
+fichero.write("AZM     " + "MAGNTD  " + "R-Evel " +	"R-Nvel " + "R-AZM   " + "R-MANGTD  " + "MODELO" + "\n")
 ###Marcadores de columnas archivo excel
 Vector_sheet["A1"] = "DATOS";  Vector_sheet["B1"] = "PPP" 
 Vector_sheet["A2"] = "AZM";  Vector_sheet["B2"] = "MAGNTD" 
@@ -220,11 +232,11 @@ for listModel in MotionModel_Geodesic:
     Vector_sheet.cell(row=counterlist+7, column=2).value = magnt_global[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=3).value = residual_Evel[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=4).value = residual_Nvel[counterlist] 
-    Vector_sheet.cell(row=counterlist+7, column=5).value = residual_AZM[counterlist]
+    Vector_sheet.cell(row=counterlist+7, column=5).value = residual_AZM[counterlist] + 180
     Vector_sheet.cell(row=counterlist+7, column=6).value = residual_magntd[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=7).value = listModel[4]
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   "  + str(round(residual_Evel[counterlist],2)) + "   "   
-    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(residual_AZM[counterlist]) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
+    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round((residual_AZM[counterlist])+180,2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -237,7 +249,7 @@ PPP_Vector(Velocidad_E,velocidad_N)
 Vmodel_graph(MotionModel_Geodephysic, Velocidad_E,velocidad_N)
 ###Marcadores de columnas archivo TXT
 fichero.write("MODELOS GEOFISICOS VERTICE: " + estacion + "\n")
-fichero.write("AZM     " + "MAGNTD " + "R-Evel " +	"R-Nvel " + "R-AZM " + "R-MANGTD  " + "MODELO" + "\n")
+fichero.write("AZM     " + "MAGNTD  " + "R-Evel " +	"R-Nvel " + "R-AZM   " + "R-MANGTD  " + "MODELO" + "\n")
 ###Marcadores de columnas archivo excel
 Vector_sheet["A17"] = "MODELOS"; Vector_sheet["B17"] = "GEOFISICOS"
 Vector_sheet["A18"] = "AZIMUTH";  Vector_sheet["B18"] = "MANGTD" ;  
@@ -263,11 +275,11 @@ for listModel in MotionModel_Geodephysic:
     Vector_sheet.cell(row=counterlist+19, column=2).value = magnt_global[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=3).value = residual_Evel[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=4).value = residual_Nvel[counterlist] 
-    Vector_sheet.cell(row=counterlist+19, column=5).value = residual_AZM[counterlist]
+    Vector_sheet.cell(row=counterlist+19, column=5).value = residual_AZM[counterlist]+ 180
     Vector_sheet.cell(row=counterlist+19, column=6).value = residual_magntd[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=7).value = listModel[4]
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   "  + str(round(residual_Evel[counterlist],2)) + "   "   
-    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(residual_AZM[counterlist]) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
+    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round((residual_AZM[counterlist])+180,2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
     counterlist = counterlist+1
 fichero.write("\n")
 
@@ -279,7 +291,7 @@ ejes_conf(3, ("Modelos Combinados - Vectice: " + estacion))
 PPP_Vector(Velocidad_E,velocidad_N)                     
 Vmodel_graph(MotionModel_Combinated, Velocidad_E,velocidad_N)
 fichero.write("MODELOS COMBINADOS VERTICE: " + estacion + "\n")
-fichero.write("AZM     " + "MAGNTD " + "R-Evel " +	"R-Nvel " + "R-AZM " + "R-MANGTD  " + "MODELO" + "\n")
+fichero.write("AZM     " + "MAGNTD  " + "R-Evel " +	"R-Nvel " + "R-AZM   " + "R-MANGTD  " + "MODELO" + "\n")
 ###Marcadores de columnas archivo excel
 Vector_sheet["A25"] = "MODELOS"; Vector_sheet["B25"] = "COMBINADO"
 Vector_sheet["A26"] = "AZIMUTH";  Vector_sheet["B26"] = "MANGTD" ;  
@@ -306,17 +318,17 @@ for listModel in MotionModel_Combinated:
     Vector_sheet.cell(row=counterlist+27, column=2).value = magnt_global[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=3).value = residual_Evel[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=4).value = residual_Nvel[counterlist] 
-    Vector_sheet.cell(row=counterlist+27, column=5).value = residual_AZM[counterlist]
+    Vector_sheet.cell(row=counterlist+27, column=5).value = residual_AZM[counterlist] + 180
     Vector_sheet.cell(row=counterlist+27, column=6).value = residual_magntd[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=7).value = listModel[4]  
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   "  + str(round(residual_Evel[counterlist],2)) + "   "   
-    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(residual_AZM[counterlist]) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
+    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round((residual_AZM[counterlist])+180,2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
 vector_book.save(path_OUT + "VECTORES_" + estacion + "_" + Relacion + ".xlsx")                                                          # Guarda el archivo xlsx en una direccion especifica
-vector_book.close()
+#vector_book.close()
 fichero.close() 
 plt.grid(False)                                                                                                       #Se omite la graficacion de la grilla
 plt.show()                                                                                                            #Se crea muestra el grafico
