@@ -11,7 +11,6 @@
 #                      v            
 #                     S 180°
 
-
 import os                                                                                                               ## Importar modulo de comandos del sistema windows CMD
 import math                                                                                                             ## Importar modulo matematico de python
 import numpy as np                                                                                                      ## Libreria con modulos matematicos avanzados
@@ -21,13 +20,13 @@ from openpyxl import Workbook                                                   
 
 
 ###VARIABLES DE INDENTIFICACION###
-estacion = "ABCC"
+estacion = "GARA"
 ##PPP
-Velocidad_E = -1.07
-velocidad_N = 16.9
-path = "D:/MODEL MOTION EXCEL/ESTACIONES CA(NNR)/MAGNAECO"
+Velocidad_E = 1.165
+velocidad_N = 13.36
+path = "D:/GNSS Project Files/MODEL MOTION PLATE EXCEL/ESTACIONES CA(NNR)/MAGNAECO"
 Relacion = "CA(NNR)"
-path_OUT = "F:/Archivos y datos GNSS/VECTORES/CA(NNR)/"
+path_OUT = "C:/Users/julia/Desktop/vectores/CA(NNR)/"
 
 residual_Evel = []
 residual_Nvel = []
@@ -222,21 +221,24 @@ Vector_sheet["G6"] = "MODELO"
 counterlist = 0
 for listModel in MotionModel_Geodesic:
     ##Calculo de vector residual
-    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                        # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
-    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                        # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
+    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                      # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
+    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                      # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
     residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))
-    residual_AZM.append(round(azimuth(residual_Evel[counterlist], residual_Nvel[counterlist]),2))
-    
+    residual_AZM.append(round(azimuth(residual_Nvel[counterlist], residual_Evel[counterlist]),2))              ##Se calcula la del vector residual azimuth en el sentido de las manecillas de reloj
+    if residual_magntd[counterlist] == round(magnitude(0, 0, Velocidad_E, velocidad_N),2):                     ##Si el vector del modelo tiene diferencia de magnitud igual a la del PPP
+        residual_AZM[counterlist] = (azimuth(velocidad_N, Velocidad_E))                                        ##El angulo se ajustara para que tenga el mismo azimuth que el PPP
+                                                                                                               ##Debido a que se genera un error en el azimuth cuando el modelo no tiene magnitud
+        
     #Escritura DE DATOS en excel
     Vector_sheet.cell(row = counterlist+7, column = 1).value = azimuths_global[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=2).value = magnt_global[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=3).value = residual_Evel[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=4).value = residual_Nvel[counterlist] 
-    Vector_sheet.cell(row=counterlist+7, column=5).value = residual_AZM[counterlist] + 180
+    Vector_sheet.cell(row=counterlist+7, column=5).value = residual_AZM[counterlist] 
     Vector_sheet.cell(row=counterlist+7, column=6).value = residual_magntd[counterlist]
     Vector_sheet.cell(row=counterlist+7, column=7).value = listModel[4]
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   "  + str(round(residual_Evel[counterlist],2)) + "   "   
-    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round((residual_AZM[counterlist])+180,2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
+    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round(residual_AZM[counterlist],2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -265,21 +267,24 @@ residual_magntd = []
 residual_AZM = []
 for listModel in MotionModel_Geodephysic:
     ##Calculo de vector residual
-    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                        # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
-    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                        # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
-    residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))
-    residual_AZM.append(round(azimuth(residual_Evel[counterlist], residual_Nvel[counterlist]),2))
-
+    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                      # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
+    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                      # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
+    residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))    ##Se calcula la del vector residual azimuth en el sentido de las manecillas de reloj
+    residual_AZM.append(round(azimuth(residual_Nvel[counterlist], residual_Evel[counterlist]),2))
+    if residual_magntd[counterlist] == round(magnitude(0, 0, Velocidad_E, velocidad_N),2):                     ##Si el vector del modelo tiene diferencia de magnitud igual a la del PPP
+        residual_AZM[counterlist] = (azimuth(velocidad_N, Velocidad_E)-180)                                    ##El angulo se ajustara para que tenga el mismo azimuth que el PPP
+                                                                                                               ##Debido a que se genera un error en el azimuth cuando el modelo no tiene magnitud
+                                                                                                               ##Este proceso hara que el vector residual sea igual al PPP en magnitud y azimuth
     #Escritura DE DATOS en excel
     Vector_sheet.cell(row = counterlist+19, column = 1).value = azimuths_global[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=2).value = magnt_global[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=3).value = residual_Evel[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=4).value = residual_Nvel[counterlist] 
-    Vector_sheet.cell(row=counterlist+19, column=5).value = residual_AZM[counterlist]+ 180
+    Vector_sheet.cell(row=counterlist+19, column=5).value = residual_AZM[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=6).value = residual_magntd[counterlist]
     Vector_sheet.cell(row=counterlist+19, column=7).value = listModel[4]
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   "  + str(round(residual_Evel[counterlist],2)) + "   "   
-    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round((residual_AZM[counterlist])+180,2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
+    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round(residual_AZM[counterlist],2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
     counterlist = counterlist+1
 fichero.write("\n")
 
@@ -308,21 +313,24 @@ residual_AZM = []
 
 for listModel in MotionModel_Combinated:
     ##Calculo de vector residual
-    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                        # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
-    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                        # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
+    residual_Evel.append(Velocidad_E -  sheet_ranges[listModel[2]].value)                                      # Obtencion de los datos  de velocidad_E del PPP de las celdas dentro de excel 
+    residual_Nvel.append(velocidad_N -  sheet_ranges[listModel[3]].value)                                      # Obtencion de los datos  de velocidad_N del PPP de las celdas dentro de excel
     residual_magntd.append(round(magnitude(0, 0, residual_Evel[counterlist],residual_Nvel[counterlist]),2))
-    residual_AZM.append(round(azimuth(residual_Evel[counterlist], residual_Nvel[counterlist]),2))
-
+    residual_AZM.append(round(azimuth(residual_Nvel[counterlist], residual_Evel[counterlist]),2))              ##Se calcula la del vector residual azimuth en el sentido de las manecillas de reloj
+    if residual_magntd[counterlist] == round(magnitude(0, 0, Velocidad_E, velocidad_N),2):                     ##Si el vector del modelo tiene diferencia de magnitud igual a la del PPP
+        residual_AZM[counterlist] = (azimuth(velocidad_N, Velocidad_E)-180)                                    ##El angulo se ajustara para que tenga el mismo azimuth que el PPP
+                                                                                                               ##Debido a que se genera un error en el azimuth cuando el modelo no tiene magnitud
+                                                                                                               ##Este proceso hara que el vector residual sea igual al PPP en magnitud y azimuth
     #Escritura DE DATOS en excel
     Vector_sheet.cell(row=counterlist+27, column = 1).value = azimuths_global[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=2).value = magnt_global[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=3).value = residual_Evel[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=4).value = residual_Nvel[counterlist] 
-    Vector_sheet.cell(row=counterlist+27, column=5).value = residual_AZM[counterlist] + 180
+    Vector_sheet.cell(row=counterlist+27, column=5).value = residual_AZM[counterlist] 
     Vector_sheet.cell(row=counterlist+27, column=6).value = residual_magntd[counterlist]
     Vector_sheet.cell(row=counterlist+27, column=7).value = listModel[4]  
     fichero.write(str(azimuths_global[counterlist]) + "   " + str(magnt_global[counterlist]) + "   "  + str(round(residual_Evel[counterlist],2)) + "   "   
-    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round((residual_AZM[counterlist])+180,2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
+    + str(round(residual_Nvel[counterlist],2)) + "   "  + str(round(residual_AZM[counterlist],2)) + "   "  + str(residual_magntd[counterlist]) + "   "  + listModel[4] + "\n")       #Escritura en .txt
     counterlist = counterlist+1
 fichero.write("\n")
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
@@ -333,4 +341,4 @@ fichero.close()
 plt.grid(False)                                                                                                       #Se omite la graficacion de la grilla
 plt.show()                                                                                                            #Se crea muestra el grafico
 
-#plt.savefig(path_OUT + "Vectores_Estacion: " + estacion + ".png", dpi = 80)                                                  # Guardar la figura usando 72 puntos por pulgada
+#plt.savefig(path_OUT + "Vectores_Estacion: " + estacion + ".png", dpi = 80)                                          # Guardar la figura usando 72 puntos por pulgada
